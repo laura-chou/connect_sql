@@ -19,3 +19,4 @@ Add your SQL column name, data type and check allow nulls.
 You can edit value or drag table row to sort it.
 
 ## Live Demos
+https://laura-chou.github.io/connect_sql/
