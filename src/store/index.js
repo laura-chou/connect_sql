@@ -61,12 +61,16 @@ export default createStore({
       return checked
     },
     checkAllCol4 (state) {
-      let checked = (state.fields.length > 0)
+      let TypeCount = 0
+      let IsnullCount = 0
       state.fields.forEach(element => {
-        if (!element.isnull && element.type !== 'string') {
-          checked = false
-        }
+        if (element.type !== 'string') TypeCount++
+        if (element.isnull && element.type !== 'string') IsnullCount++
       })
+      let checked = false
+      if (TypeCount === IsnullCount) {
+        checked = true
+      }
       return checked
     }
   },
