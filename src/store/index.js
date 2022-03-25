@@ -32,6 +32,42 @@ export default createStore({
     },
     codes (state) {
       return state.codes
+    },
+    checkAllCol1 (state) {
+      let checked = (state.fields.length > 0)
+      state.fields.forEach(element => {
+        if (!element.check) {
+          checked = false
+        }
+      })
+      return checked
+    },
+    checkAllCol2 (state) {
+      let checked = (state.fields.length > 0)
+      state.fields.forEach(element => {
+        if (!element.check2) {
+          checked = false
+        }
+      })
+      return checked
+    },
+    checkAllCol3 (state) {
+      let checked = (state.fields.length > 0)
+      state.fields.forEach(element => {
+        if (!element.check3) {
+          checked = false
+        }
+      })
+      return checked
+    },
+    checkAllCol4 (state) {
+      let checked = (state.fields.length > 0)
+      state.fields.forEach(element => {
+        if (!element.isnull && element.type !== 'string') {
+          checked = false
+        }
+      })
+      return checked
     }
   },
   mutations: {
@@ -62,13 +98,11 @@ export default createStore({
     cancelField (state, index) {
       state.fields[index].editType = state.fields[index].type
       state.fields[index].editName = state.fields[index].name
-      state.fields[index].editNull = state.fields[index].isnull
       state.fields[index].edit = false
     },
     updateField (state, { field, index }) {
       state.fields[index].type = state.fields[index].editType
       state.fields[index].name = state.fields[index].editName
-      state.fields[index].isnull = state.fields[index].editNull
       state.fields[index] = field
     },
     changeField (state, field) {
@@ -76,14 +110,43 @@ export default createStore({
     },
     checkbox (state, { checkbox, ischeck, index }) {
       switch (checkbox) {
-        case '1':
+        case 1:
           state.fields[index].check = ischeck
           break
-        case '2':
+        case 2:
           state.fields[index].check2 = ischeck
           break
-        case '3':
+        case 3:
           state.fields[index].check3 = ischeck
+          break
+        case 4:
+          state.fields[index].isnull = ischeck
+          break
+      }
+    },
+    checkAll (state, { checkbox, ischeck }) {
+      switch (checkbox) {
+        case 1:
+          state.fields.forEach(element => {
+            element.check = ischeck
+          })
+          break
+        case 2:
+          state.fields.forEach(element => {
+            element.check2 = ischeck
+          })
+          break
+        case 3:
+          state.fields.forEach(element => {
+            element.check3 = ischeck
+          })
+          break
+        case 4:
+          state.fields.forEach(element => {
+            if (element.type !== 'string') {
+              element.isnull = ischeck
+            }
+          })
           break
       }
     }

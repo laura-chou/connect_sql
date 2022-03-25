@@ -13,7 +13,7 @@ Input your web.config connectionStrings name.
 ### Table Name
 Input your SQL Table name.
 ### Field
-Add your SQL column name, data type and check allow nulls.
+Add your SQL column name and data type
 
 ![](image2.JPG)
 You can edit value or drag table row to sort it.

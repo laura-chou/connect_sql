@@ -62,7 +62,7 @@
                 <tr>
                   <td colspan="8">
                     <div class="form-group row d-flex align-items-center">
-                      <select class="form-select no-validate" v-model="addType" style="width:30%" @change="ChangeType($event)">
+                      <select class="form-select no-validate" v-model="addType" style="width:30%">
                         <option selected value="">Choose Type...</option>
                         <option value="string">String</option>
                         <option value="int">Int</option>
@@ -71,11 +71,6 @@
                       </select>
                       &emsp;
                       <input type="text" class="form-control no-validate" v-model="addName" autocomplete="off" placeholder="Name" style="width:30%">
-                      &emsp;
-                      <div class="form-check form-check-inline" style="width:5%">
-                        <input id="add-null" class="form-check-input" type="checkbox" v-model="addNull">
-                        <label class="form-check-label">isnull</label>
-                      </div>
                       &emsp;
                       <button type="button" class="btn btn-primary d-flex" @click="AddItem" style="width:auto">
                         <vue-feather type="plus" stroke="white"></vue-feather>
@@ -88,12 +83,24 @@
                 </tr>
                 <tr class="title">
                   <th></th>
-                  <th>{{ crudField }}</th>
-                  <th>WHERE</th>
-                  <th>ORDER BY</th>
+                  <th>
+                    <input id="check-all-col1" class="form-check-input" type="checkbox" @click="CheckAllItem(1)" :checked="CheckAllCol(1)">
+                    <div>{{ crudField }}</div>
+                  </th>
+                  <th>
+                    <input id="check-all-col2" class="form-check-input" type="checkbox" @click="CheckAllItem(2)" :checked="CheckAllCol(2)">
+                    <div>WHERE</div>
+                  </th>
+                  <th>
+                    <input id="check-all-col3" class="form-check-input" type="checkbox" @click="CheckAllItem(3)" :checked="CheckAllCol(3)">
+                    <div>ORDER BY</div>
+                  </th>
                   <th>Type</th>
                   <th>Name</th>
-                  <th>Null</th>
+                  <th>
+                    <input id="check-all-col4" class="form-check-input" type="checkbox" @click="CheckAllItem(4)" :checked="CheckAllCol(4)">
+                    <div>Null</div>
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -104,13 +111,13 @@
                       <vue-feather class="handle" type="align-justify" stroke="black"></vue-feather>
                     </td>
                     <td>
-                      <input class="form-check-input" type="checkbox" v-if="(!element.edit && crudField !== 'DELETE')" :checked=element.check @click="CheckItem('1', element.check, index)">
+                      <input class="form-check-input" type="checkbox" v-if="(!element.edit && crudField !== 'DELETE')" :checked=element.check @click="CheckItem(1, element.check, index)">
                     </td>
                     <td>
-                      <input class="form-check-input" type="checkbox" v-if="(!element.edit && crudField !== 'INSERT INTO')" :checked=element.check2 @click="CheckItem('2', element.check2, index)">
+                      <input class="form-check-input" type="checkbox" v-if="(!element.edit && crudField !== 'INSERT INTO')" :checked=element.check2 @click="CheckItem(2, element.check2, index)">
                     </td>
                     <td>
-                      <input class="form-check-input" type="checkbox" v-if="(!element.edit && crudField === 'SELECT')" :checked=element.check3 @click="CheckItem('3', element.check3, index)">
+                      <input class="form-check-input" type="checkbox" v-if="(!element.edit && crudField === 'SELECT')" :checked=element.check3 @click="CheckItem(3, element.check3, index)">
                     </td>
                     <td v-if="!element.edit">{{ element.type }}</td>
                     <td v-else>
@@ -125,11 +132,8 @@
                     <td v-else>
                       <input type="text" class="form-control" v-model="element.editName">
                     </td>
-                    <td v-if="!element.edit">
-                      <input class="form-check-input" type="checkbox" :checked=element.isnull disabled>
-                    </td>
-                    <td v-else>
-                      <input class="form-check-input" type="checkbox" v-model="element.editNull" :disabled="EditNull(element.editType)">
+                    <td>
+                      <input v-if="!element.edit && element.type !== 'string'" class="form-check-input" type="checkbox" :checked=element.isnull @click="CheckItem(4, element.isnull, index)">
                     </td>
                     <td class="d-flex justify-content-center" v-if="!element.edit">
                       <button type="button" class="btn btn-success d-flex" @click="EditItem(element)">
@@ -181,7 +185,6 @@ export default {
       fields: this.$store.getters.fields,
       addType: '',
       addName: '',
-      addNull: false,
       isSubmit: false
     }
   },
@@ -212,13 +215,6 @@ export default {
     CheckMove () {
       const field = this.fields
       this.$store.commit('changeField', field)
-    },
-    ChangeType (event) {
-      if (event.target.value === 'string') {
-        document.getElementById('add-null').disabled = true
-      } else {
-        document.getElementById('add-null').disabled = false
-      }
     },
     Submit () {
       this.isSubmit = true
@@ -443,15 +439,24 @@ export default {
       } else if (this.addName === '') {
         alert('Please input name')
       } else {
-        const fields = this.fields
-        const data = { type: this.addType, editType: this.addType, name: this.addName, editName: this.addName, isnull: this.addNull, editNull: this.addNull, edit: false, check: true, check2: false, check3: false }
-        this.$store.commit('addField', { fields, data })
-        this.addType = ''
-        this.addName = ''
-        this.addNull = false
-        if (this.isSubmit) {
-          document.getElementsByClassName('field')[0].style.display = 'none'
-          document.getElementsByClassName('title')[0].style.borderBottom = 'none'
+        let isRepeat = false
+        this.fields.forEach(element => {
+          if (element.name === this.addName) {
+            isRepeat = true
+          }
+        })
+        if (isRepeat) {
+          alert('This field already has the same name')
+        } else {
+          const fields = this.fields
+          const data = { type: this.addType, editType: this.addType, name: this.addName, editName: this.addName, isnull: false, edit: false, check: true, check2: false, check3: false }
+          this.$store.commit('addField', { fields, data })
+          this.addType = ''
+          this.addName = ''
+          if (this.isSubmit) {
+            document.getElementsByClassName('field')[0].style.display = 'none'
+            document.getElementsByClassName('title')[0].style.borderBottom = 'none'
+          }
         }
       }
     },
@@ -477,6 +482,44 @@ export default {
     CheckItem (checkbox, check, index) {
       const ischeck = !(check)
       this.$store.commit('checkbox', { checkbox, ischeck, index })
+    },
+    CheckAllCol (checkbox) {
+      let checked = false
+      switch (checkbox) {
+        case 1:
+          checked = this.$store.getters.checkAllCol1
+          break
+        case 2:
+          checked = this.$store.getters.checkAllCol2
+          break
+        case 3:
+          checked = this.$store.getters.checkAllCol3
+          break
+        case 4:
+          checked = this.$store.getters.checkAllCol4
+          break
+      }
+      return checked
+    },
+    CheckAllItem (checkbox) {
+      let el = ''
+      let ischeck = ''
+      switch (checkbox) {
+        case 1:
+          el = document.getElementById('check-all-col1')
+          break
+        case 2:
+          el = document.getElementById('check-all-col2')
+          break
+        case 3:
+          el = document.getElementById('check-all-col3')
+          break
+        case 4:
+          el = document.getElementById('check-all-col4')
+          break
+      }
+      ischeck = el.checked
+      this.$store.commit('checkAll', { checkbox, ischeck })
     },
     EditNull (type) {
       if (type === 'string') {
