@@ -68,7 +68,7 @@ export default createStore({
         if (element.isnull && element.type !== 'string') IsnullCount++
       })
       let checked = false
-      if (TypeCount === IsnullCount) {
+      if (TypeCount === IsnullCount && (TypeCount + IsnullCount) !== 0) {
         checked = true
       }
       return checked
